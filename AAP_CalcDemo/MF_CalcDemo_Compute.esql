@@ -1,0 +1,48 @@
+
+
+DECLARE ns NAMESPACE 'http://tempuri.org/';
+
+
+CREATE COMPUTE MODULE MF_CalcDemo_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		DECLARE reftoIn REFERENCE TO InputRoot.JSON.Data;
+		set Environment.Variable.Operation = reftoIn.Operation;
+		CASE
+
+		WHEN reftoIn.Operation='Add' THEN
+			SET OutputRoot.XMLNSC.ns:Add.ns:intA = reftoIn.Operand1;
+			SET OutputRoot.XMLNSC.ns:Add.ns:intB = reftoIn.Operand2;
+		WHEN reftoIn.Operation='Subtract' THEN
+			SET OutputRoot.XMLNSC.ns:Subtract.ns:intA = reftoIn.Operand1;
+			SET OutputRoot.XMLNSC.ns:Subtract.ns:intB = reftoIn.Operand2;
+		WHEN reftoIn.Operation='Multiply' THEN
+			SET OutputRoot.XMLNSC.ns:Multiply.ns:intA = reftoIn.Operand1;
+			SET OutputRoot.XMLNSC.ns:Multiply.ns:intB = reftoIn.Operand2;
+		WHEN reftoIn.Operation='Divide' THEN
+			SET OutputRoot.XMLNSC.ns:Divide.ns:intA = reftoIn.Operand1;
+			SET OutputRoot.XMLNSC.ns:Divide.ns:intB = reftoIn.Operand2;
+
+		ELSE
+
+		END CASE;
+		set OutputLocalEnvironment.Destination.SOAP.Request.Operation = reftoIn.Operation;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;

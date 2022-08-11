@@ -1,0 +1,40 @@
+
+
+
+
+CREATE COMPUTE MODULE MF_CalcDemo_Compute1
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		-- CALL CopyEntireMessage();
+		CASE
+		WHEN Environment.Variable.Operation = 'Add' THEN
+			SET OutputRoot.JSON.Data.RESULT = InputRoot.XMLNSC.ns:AddResponse.ns:AddResult;
+		WHEN Environment.Variable.Operation = 'Subtract' THEN
+			SET OutputRoot.JSON.Data.RESULT = InputRoot.XMLNSC.ns:SubtractResponse.ns:SubtractResult;
+		WHEN Environment.Variable.Operation = 'Multiply' THEN
+			SET OutputRoot.JSON.Data.RESULT = InputRoot.XMLNSC.ns:MultiplyResponse.ns:MultiplyResult;
+		WHEN Environment.Variable.Operation = 'Divide' THEN
+			SET OutputRoot.JSON.Data.RESULT = InputRoot.XMLNSC.ns:DivideResponse.ns:DivideResult;
+
+		ELSE
+
+		END CASE;
+
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
